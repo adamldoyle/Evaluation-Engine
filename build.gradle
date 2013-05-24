@@ -1,0 +1,48 @@
+description = "Evaluation engine for processing a cycle of inputs into appropriate output."
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+archivesBaseName = name.replace(' ', '-').toLowerCase()
+
+version = getVersionNumber()
+
+sourceCompatibility=1.7
+targetCompatibility=1.7
+
+//define repositories to use
+repositories {
+	if (!hasProperty("repositoryDirectory")) {
+        throw new InvalidUserDataException("repositoryDirectory missing from gradle.properties file.  Check sample.gradle.properties for usage")
+    }
+    flatDir name: 'repository', dirs: repositoryDirectory
+}
+
+uploadArchives {
+    repositories {
+        if (!hasProperty("repositoryDirectory")) {
+	        throw new InvalidUserDataException("repositoryDirectory missing from gradle.properties file.  Check sample.gradle.properties for usage")
+	    }
+        flatDir {
+            dirs repositoryDirectory
+        }
+    }
+}
+
+sourceSets {
+    main {
+        java { srcDir 'src' }
+    }
+}
+
+String getVersionNumber() {
+    //build number should be set as BUILD_NUMBER environment variable by build system
+    def env = System.getenv()
+    def buildNumber = env.BUILD_NUMBER?.toInteger()
+
+    if( buildNumber == null){
+        return "1.0.0.0"
+    }else{
+        return "1.0.0." + buildNumber
+    }
+}
